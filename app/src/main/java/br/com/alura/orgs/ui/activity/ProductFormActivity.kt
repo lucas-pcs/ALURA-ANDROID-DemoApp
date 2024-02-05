@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import br.com.alura.orgs.R
+import br.com.alura.orgs.dao.ProductDAO
 import br.com.alura.orgs.ui.model.Product
 import java.math.BigDecimal
 
@@ -37,7 +38,14 @@ class ProductFormActivity : AppCompatActivity() {
                 value = value
             )
 
-            Log.d("ProductForm", "onCreate: $newProduct")
+            Log.d("ProductForm", "on click save button new product: $newProduct")
+
+            val productDAO = ProductDAO()
+            val productList = productDAO.getProductList()
+            productDAO.addProduct(newProduct)
+
+            Log.d("ProductForm", "Product List: $productList")
+            finish()
         }
     }
 }

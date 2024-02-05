@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import br.com.alura.orgs.R
+import br.com.alura.orgs.dao.ProductDAO
 import br.com.alura.orgs.ui.model.Product
 import br.com.alura.orgs.ui.recyclerview.adapter.ProductListAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -16,13 +17,16 @@ class ProductListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+    }
 
-        val productList: List<Product> = listOf(
-            Product("banana", "banana desc", BigDecimal("19.99")),
-            Product("maça", "maça desc", BigDecimal("29.99"))
-        )
+    override fun onResume() {
+        super.onResume()
+
+        val productDAO = ProductDAO()
+        val productList: List<Product> = productDAO.getProductList()
 
         val productListRecyclerView: RecyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+
         productListRecyclerView.adapter = ProductListAdapter(context = this, productList = productList)
         productListRecyclerView.layoutManager = LinearLayoutManager(this)
 
