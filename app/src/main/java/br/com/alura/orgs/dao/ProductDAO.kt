@@ -9,7 +9,7 @@ class ProductDAO {
     }
 
     fun getProductList(): List<Product>{
-        return productList
+        return productList.toList()
     }
 
     companion object {

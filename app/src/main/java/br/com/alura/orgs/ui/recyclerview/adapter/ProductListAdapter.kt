@@ -12,8 +12,10 @@ import br.com.alura.orgs.ui.model.Product
 
 class ProductListAdapter(
     private val context: Context,
-    private val productList: List<Product>
+    productList: List<Product>
 ) : RecyclerView.Adapter<ProductListAdapter.ProductViewHolder>() {
+
+    private val productListDataSet = productList.toMutableList()
 
     class ProductViewHolder(view: View) : ViewHolder(view) {
         fun bind(product: Product){
@@ -33,11 +35,17 @@ class ProductListAdapter(
     }
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
-        holder.bind(productList[position])
+        holder.bind(productListDataSet[position])
     }
 
     override fun getItemCount(): Int {
-        return productList.size
+        return productListDataSet.size
+    }
+
+    fun refreshList(productList: List<Product>) {
+        this.productListDataSet.clear()
+        this.productListDataSet.addAll(productList)
+        notifyDataSetChanged()
     }
 
 }
