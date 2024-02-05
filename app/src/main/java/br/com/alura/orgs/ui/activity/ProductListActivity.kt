@@ -1,16 +1,16 @@
-package br.com.alura.orgs.ui
+package br.com.alura.orgs.ui.activity
 
 import android.app.Activity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import br.com.alura.orgs.R
 import br.com.alura.orgs.ui.model.Product
 import br.com.alura.orgs.ui.recyclerview.adapter.ProductListAdapter
 import java.math.BigDecimal
 
-class MainActivity : Activity() {
+class ProductListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

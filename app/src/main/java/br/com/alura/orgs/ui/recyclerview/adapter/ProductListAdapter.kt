@@ -18,13 +18,13 @@ class ProductListAdapter(
     class ProductViewHolder(view: View) : ViewHolder(view) {
         fun bind(product: Product){
             var nomeTv = itemView.findViewById<TextView>(R.id.nome)
-            nomeTv.text = product.nome
+            nomeTv.text = product.name
 
             var descricaoTv= itemView.findViewById<TextView>(R.id.descricao)
-            descricaoTv.text = product.descricao
+            descricaoTv.text = product.description
 
             var valorTv = itemView.findViewById<TextView>(R.id.valor)
-            valorTv.text = product.valor.toPlainString()
+            valorTv.text = product.value.toPlainString()
         }
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
