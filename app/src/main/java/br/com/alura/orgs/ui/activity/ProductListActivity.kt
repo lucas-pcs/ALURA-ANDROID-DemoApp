@@ -5,17 +5,19 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import br.com.alura.orgs.R
 import br.com.alura.orgs.dao.ProductDAO
+import br.com.alura.orgs.databinding.ActivityProductListBinding
 import br.com.alura.orgs.ui.recyclerview.adapter.ProductListAdapter
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class ProductListActivity : AppCompatActivity() {
     private val productDAO = ProductDAO()
     private val adapterProductList = ProductListAdapter(context = this, productList = productDAO.getProductList())
+    private val productListBinding by lazy {
+        ActivityProductListBinding.inflate(layoutInflater)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_product_list)
+        setContentView(productListBinding.root)
 
         configureRecyclerView()
         configureFAB()
@@ -27,7 +29,7 @@ class ProductListActivity : AppCompatActivity() {
     }
 
     private fun configureFAB() {
-        val fabCreateForm = findViewById<FloatingActionButton>(R.id.activity_product_list_fab)
+        val fabCreateForm = productListBinding.activityProductListFab
         fabCreateForm.setOnClickListener {
             val intentGoToForm = Intent(this, ProductFormActivity::class.java)
             startActivity(intentGoToForm)
@@ -35,7 +37,7 @@ class ProductListActivity : AppCompatActivity() {
     }
 
     private fun configureRecyclerView() {
-        val productListRecyclerView: RecyclerView = findViewById<RecyclerView>(R.id.activity_product_list_recycler_view)
+        val productListRecyclerView: RecyclerView = productListBinding.activityProductListRecyclerView
         productListRecyclerView.adapter = adapterProductList
         productListRecyclerView.layoutManager = LinearLayoutManager(this)
     }

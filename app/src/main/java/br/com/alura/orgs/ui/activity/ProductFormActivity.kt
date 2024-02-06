@@ -6,19 +6,25 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import br.com.alura.orgs.R
 import br.com.alura.orgs.dao.ProductDAO
+import br.com.alura.orgs.databinding.ActivityProductFormBinding
 import br.com.alura.orgs.ui.model.Product
 import java.math.BigDecimal
 
 class ProductFormActivity : AppCompatActivity() {
 
+    private val productFormBinding by lazy {
+        ActivityProductFormBinding.inflate(layoutInflater)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_product_form)
+
+        setContentView(productFormBinding.root)
         configureSaveButton()
     }
 
     private fun configureSaveButton() {
-        val saveButton = findViewById<Button>(R.id.activity_product_form_save_button)
+        val saveButton = productFormBinding.activityProductFormSaveButton
         val productDAO = ProductDAO()
         saveButton.setOnClickListener {
             val newProduct = createNewProduct()
@@ -28,13 +34,13 @@ class ProductFormActivity : AppCompatActivity() {
     }
 
     private fun createNewProduct(): Product {
-        val fieldName = findViewById<EditText>(R.id.activity_product_form_name)
+        val fieldName = productFormBinding.activityProductFormName
         val name = fieldName.text.toString()
 
-        val fieldDescription = findViewById<EditText>(R.id.activity_product_form_description)
+        val fieldDescription = productFormBinding.activityProductFormDescription
         val description = fieldDescription.text.toString()
 
-        val fieldValue = findViewById<EditText>(R.id.activity_product_form_value)
+        val fieldValue = productFormBinding.activityProductFormValue
         val valueInText = fieldValue.text.toString()
 
         val value = if (valueInText.isBlank()) {
