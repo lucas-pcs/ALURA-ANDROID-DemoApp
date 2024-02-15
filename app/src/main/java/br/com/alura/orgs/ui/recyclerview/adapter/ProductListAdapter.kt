@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import br.com.alura.orgs.databinding.ProductItemBinding
 import br.com.alura.orgs.ui.model.Product
+import coil.load
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -20,12 +21,14 @@ class ProductListAdapter(
         private val nomeTv = productItemBinding.productItemName
         private val descricaoTv= productItemBinding.productItemDescription
         private val valorTv = productItemBinding.productItemValue
+        private val imageIv = productItemBinding.productItemImage
 
         fun bind(product: Product){
             nomeTv.text = product.name
             descricaoTv.text = product.description
             val productValueString = NumberFormat.getCurrencyInstance(Locale("pt", "br")).format(product.value)
             valorTv.text = productValueString
+            imageIv.load(product.imageURL)
         }
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {

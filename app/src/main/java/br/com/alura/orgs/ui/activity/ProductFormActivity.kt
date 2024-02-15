@@ -1,12 +1,15 @@
 package br.com.alura.orgs.ui.activity
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import br.com.alura.orgs.R
 import br.com.alura.orgs.dao.ProductDAO
 import br.com.alura.orgs.databinding.ActivityProductFormBinding
+import br.com.alura.orgs.databinding.ProductFormImageloadBinding
 import br.com.alura.orgs.ui.model.Product
+import coil.load
 import java.math.BigDecimal
 
 class ProductFormActivity : AppCompatActivity() {
@@ -14,6 +17,13 @@ class ProductFormActivity : AppCompatActivity() {
     private val productFormBinding by lazy {
         ActivityProductFormBinding.inflate(layoutInflater)
     }
+
+    private val productFormImageloadBinding by lazy {
+        ProductFormImageloadBinding.inflate(layoutInflater)
+    }
+
+    private var url: String? = null
+
     private val productDAO = ProductDAO()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,10 +34,17 @@ class ProductFormActivity : AppCompatActivity() {
         val imageButton = productFormBinding.activityProductFormImage
         imageButton.setOnClickListener {
             AlertDialog.Builder(this)
-                .setView(R.layout.product_form_imageload)
-                .setPositiveButton("Confirm") { _, _ -> }
+                .setView(productFormImageloadBinding.root)
+                .setPositiveButton("Confirm") { _, _ ->
+                    productFormBinding.activityProductFormImage.load(url)
+                }
                 .setNegativeButton("Cancel") { _, _->}
                 .show()
+        }
+
+        productFormImageloadBinding.productFormImageloadButton.setOnClickListener {
+            url = productFormImageloadBinding.productFormImageloadTextinputedittextUrl.text.toString()
+            productFormImageloadBinding.productFormImageloadImage.load(url)
         }
 
     }
@@ -60,7 +77,8 @@ class ProductFormActivity : AppCompatActivity() {
         return Product(
             name = name,
             description = description,
-            value = value
+            value = value,
+            imageURL = url
         )
     }
 }

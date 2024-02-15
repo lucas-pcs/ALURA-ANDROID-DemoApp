@@ -17,8 +17,7 @@
             android:src="@drawable/default_image"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/product_form_imageload_button"
@@ -29,8 +28,7 @@
             app:layout_constraintTop_toBottomOf="@id/product_form_imageload_image"
             app:layout_constraintBottom_toBottomOf="@id/product_form_imageload_image"
             app:layout_constraintStart_toStartOf="@id/product_form_imageload_image"
-            app:layout_constraintEnd_toEndOf="@id/product_form_imageload_image"
-            />
+            app:layout_constraintEnd_toEndOf="@id/product_form_imageload_image" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/product_form_imageload_textinputlayout_url"
@@ -40,18 +38,16 @@
             app:layout_constraintTop_toBottomOf="@id/product_form_imageload_image"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            >
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/product_form_imageload_textinputedittext_url"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Image URL"
-                android:inputType="textUri"
-                />
+                android:inputType="textUri" />
+
         </com.google.android.material.textfield.TextInputLayout>
-
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

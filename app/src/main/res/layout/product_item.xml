@@ -24,7 +24,6 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/produto_1"
             app:layout_constraintWidth_percent="0.3"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/product_item_name"

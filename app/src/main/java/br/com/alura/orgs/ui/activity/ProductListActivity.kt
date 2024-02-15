@@ -28,7 +28,8 @@ class ProductListActivity : AppCompatActivity() {
             Product(
                 name = "Cesta de frutas",
                 description = "Banana, maça e uva",
-                value = BigDecimal("19.83")
+                value = BigDecimal("19.83"),
+                imageURL = "https://images.pexels.com/photos/209339/pexels-photo-209339.jpeg"
             )
         )
     }
