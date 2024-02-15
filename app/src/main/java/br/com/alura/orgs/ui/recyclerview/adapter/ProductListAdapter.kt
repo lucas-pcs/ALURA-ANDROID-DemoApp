@@ -19,9 +19,9 @@ class ProductListAdapter(
     private val productListDataSet = productList.toMutableList()
 
     class ProductViewHolder(productItemBinding: ProductItemBinding) : RecyclerView.ViewHolder(productItemBinding.root) {
-        private val nomeTv = productItemBinding.nome
-        private val descricaoTv= productItemBinding.descricao
-        private val valorTv = productItemBinding.valor
+        private val nomeTv = productItemBinding.productItemName
+        private val descricaoTv= productItemBinding.productItemDescription
+        private val valorTv = productItemBinding.productItemValue
 
         fun bind(product: Product){
             nomeTv.text = product.name

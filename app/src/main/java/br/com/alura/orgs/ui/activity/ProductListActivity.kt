@@ -7,7 +7,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import br.com.alura.orgs.dao.ProductDAO
 import br.com.alura.orgs.databinding.ActivityProductListBinding
+import br.com.alura.orgs.ui.model.Product
 import br.com.alura.orgs.ui.recyclerview.adapter.ProductListAdapter
+import java.math.BigDecimal
 
 class ProductListActivity : AppCompatActivity() {
     private val productDAO = ProductDAO()
@@ -21,6 +23,14 @@ class ProductListActivity : AppCompatActivity() {
 
         configureRecyclerView()
         configureFAB()
+
+        productDAO.addProduct(
+            Product(
+                name = "Cesta de frutas",
+                description = "Banana, maça e uva",
+                value = BigDecimal("19.83")
+            )
+        )
     }
 
     override fun onResume() {

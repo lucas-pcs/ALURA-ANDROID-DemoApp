@@ -15,17 +15,18 @@ class ProductFormActivity : AppCompatActivity() {
     private val productFormBinding by lazy {
         ActivityProductFormBinding.inflate(layoutInflater)
     }
+    private val productDAO = ProductDAO()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(productFormBinding.root)
         configureSaveButton()
+
     }
 
     private fun configureSaveButton() {
         val saveButton = productFormBinding.activityProductFormSaveButton
-        val productDAO = ProductDAO()
         saveButton.setOnClickListener {
             val newProduct = createNewProduct()
             productDAO.addProduct(newProduct)
