@@ -1,8 +1,7 @@
 package br.com.alura.orgs.ui.activity
 
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import br.com.alura.orgs.R
 import br.com.alura.orgs.dao.ProductDAO
@@ -22,6 +21,14 @@ class ProductFormActivity : AppCompatActivity() {
 
         setContentView(productFormBinding.root)
         configureSaveButton()
+        val imageButton = productFormBinding.activityProductFormImage
+        imageButton.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setView(R.layout.product_form_imageload)
+                .setPositiveButton("Confirm") { _, _ -> }
+                .setNegativeButton("Cancel") { _, _->}
+                .show()
+        }
 
     }
 
@@ -35,13 +42,13 @@ class ProductFormActivity : AppCompatActivity() {
     }
 
     private fun createNewProduct(): Product {
-        val fieldName = productFormBinding.activityProductFormName
+        val fieldName = productFormBinding.activityProductFormTextinputedittextName
         val name = fieldName.text.toString()
 
-        val fieldDescription = productFormBinding.activityProductFormDescription
+        val fieldDescription = productFormBinding.activityProductFormTextinputedittextDescription
         val description = fieldDescription.text.toString()
 
-        val fieldValue = productFormBinding.activityProductFormValue
+        val fieldValue = productFormBinding.activityProductFormTextinputedittextValue
         val valueInText = fieldValue.text.toString()
 
         val value = if (valueInText.isBlank()) {

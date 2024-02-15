@@ -8,7 +8,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "br.com.poscontrole.pdvmobi"
+        applicationId = "br.com.alura.orgs"
         minSdk = 22
         targetSdk = 34
         versionCode = 1
