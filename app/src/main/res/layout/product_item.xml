@@ -19,22 +19,15 @@
         android:layout_height="wrap_content"
         >
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/product_item_guideline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.3"
-            />
-
         <ImageView
             android:id="@+id/product_item_image"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:scaleType="centerCrop"
             android:src="@drawable/produto_1"
+            app:layout_constraintWidth_percent="0.3"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/product_item_guideline"
+            app:layout_constraintEnd_toStartOf="@id/product_item_name"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/produto_1" />
