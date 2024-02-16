@@ -8,6 +8,7 @@ import br.com.alura.orgs.R
 import br.com.alura.orgs.dao.ProductDAO
 import br.com.alura.orgs.databinding.ActivityProductFormBinding
 import br.com.alura.orgs.databinding.ProductFormImageloadBinding
+import br.com.alura.orgs.ui.extensions.loadImage
 import br.com.alura.orgs.ui.model.Product
 import coil.load
 import java.math.BigDecimal
@@ -36,7 +37,7 @@ class ProductFormActivity : AppCompatActivity() {
             AlertDialog.Builder(this)
                 .setView(productFormImageloadBinding.root)
                 .setPositiveButton("Confirm") { _, _ ->
-                    productFormBinding.activityProductFormImage.load(url)
+                    productFormBinding.activityProductFormImage.loadImage(url)
                 }
                 .setNegativeButton("Cancel") { _, _->}
                 .show()
@@ -44,7 +45,7 @@ class ProductFormActivity : AppCompatActivity() {
 
         productFormImageloadBinding.productFormImageloadButton.setOnClickListener {
             url = productFormImageloadBinding.productFormImageloadTextinputedittextUrl.text.toString()
-            productFormImageloadBinding.productFormImageloadImage.load(url)
+           productFormImageloadBinding.productFormImageloadImage.loadImage(url)
         }
 
     }

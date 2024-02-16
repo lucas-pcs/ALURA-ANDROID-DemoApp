@@ -2,9 +2,11 @@ package br.com.alura.orgs.ui.recyclerview.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import br.com.alura.orgs.databinding.ProductItemBinding
+import br.com.alura.orgs.ui.extensions.loadImage
 import br.com.alura.orgs.ui.model.Product
 import coil.load
 import java.text.NumberFormat
@@ -28,7 +30,15 @@ class ProductListAdapter(
             descricaoTv.text = product.description
             val productValueString = NumberFormat.getCurrencyInstance(Locale("pt", "br")).format(product.value)
             valorTv.text = productValueString
-            imageIv.load(product.imageURL)
+
+            val imageVisibility = if(product.imageURL == null){
+                View.GONE
+            } else {
+                View.VISIBLE
+            }
+
+            imageIv.visibility = imageVisibility
+            imageIv.loadImage(product.imageURL)
         }
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
