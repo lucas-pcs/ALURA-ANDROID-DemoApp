@@ -26,9 +26,10 @@ class ProductFormActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        title = "Register new product"
         setContentView(productFormBinding.root)
         configureSaveButton()
+
         val imageButton = productFormBinding.activityProductFormImage
         imageButton.setOnClickListener {
             ProductFormImageDialog(this).showImageDialog(url) {
