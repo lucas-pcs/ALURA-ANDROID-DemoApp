@@ -15,10 +15,12 @@ import java.math.BigDecimal
 
 class ProductListActivity : AppCompatActivity() {
     private val productDAO = ProductDAO()
-    private val adapterProductList = ProductListAdapter(context = this, productList = productDAO.getProductList())
+    private val adapterProductList =
+        ProductListAdapter(context = this, productList = productDAO.getProductList())
     private val productListBinding by lazy {
         ActivityProductListBinding.inflate(layoutInflater)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(productListBinding.root)
@@ -50,14 +52,20 @@ class ProductListActivity : AppCompatActivity() {
     }
 
     private fun configureRecyclerView() {
-        val productListRecyclerView: RecyclerView = productListBinding.activityProductListRecyclerView
+        val productListRecyclerView: RecyclerView =
+            productListBinding.activityProductListRecyclerView
         productListRecyclerView.adapter = adapterProductList
-        adapterProductList.productClickListener = object: ProductListAdapter.ProductClickListener {
-            override fun onProductClickListener(product: Product){
-                val goToProductDetail = Intent(this@ProductListActivity, ProductDetail::class.java)
-                goToProductDetail.putExtra("product",product)
-                startActivity(goToProductDetail)
-            }
+//        adapterProductList.productClickListener = object: ProductListAdapter.ProductClickListener {
+//            override fun onProductClickListener(product: Product){
+//                val goToProductDetail = Intent(this@ProductListActivity, ProductDetail::class.java)
+//                goToProductDetail.putExtra("product",product)
+//                startActivity(goToProductDetail)
+//            }
+//        }
+        adapterProductList.productClickListener = { product: Product ->
+            val goToProductDetail = Intent(this@ProductListActivity, ProductDetail::class.java)
+            goToProductDetail.putExtra("product", product)
+            startActivity(goToProductDetail)
         }
         productListRecyclerView.layoutManager = LinearLayoutManager(this)
     }
