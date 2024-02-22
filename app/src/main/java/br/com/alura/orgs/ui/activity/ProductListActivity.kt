@@ -2,9 +2,11 @@ package br.com.alura.orgs.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import br.com.alura.orgs.ProductDetail
 import br.com.alura.orgs.dao.ProductDAO
 import br.com.alura.orgs.databinding.ActivityProductListBinding
 import br.com.alura.orgs.ui.model.Product
@@ -50,6 +52,13 @@ class ProductListActivity : AppCompatActivity() {
     private fun configureRecyclerView() {
         val productListRecyclerView: RecyclerView = productListBinding.activityProductListRecyclerView
         productListRecyclerView.adapter = adapterProductList
+        adapterProductList.productClickListener = object: ProductListAdapter.ProductClickListener {
+            override fun onProductClickListener(product: Product){
+                val goToProductDetail = Intent(this@ProductListActivity, ProductDetail::class.java)
+                goToProductDetail.putExtra("product",product)
+                startActivity(goToProductDetail)
+            }
+        }
         productListRecyclerView.layoutManager = LinearLayoutManager(this)
     }
 }

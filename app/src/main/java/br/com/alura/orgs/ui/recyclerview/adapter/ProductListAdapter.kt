@@ -1,6 +1,7 @@
 package br.com.alura.orgs.ui.recyclerview.adapter
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,18 +15,37 @@ import java.util.Locale
 
 class ProductListAdapter(
     private val context: Context,
-    productList: List<Product>
+    productList: List<Product>,
+    var productClickListener: ProductClickListener = object: ProductClickListener {
+        override fun onProductClickListener(product: Product) {
+            Log.d("ProductListAdapter", "onProductClickListener: default listener")
+        }
+    }
 ) : RecyclerView.Adapter<ProductListAdapter.ProductViewHolder>() {
 
     private val productListDataSet = productList.toMutableList()
 
-    class ProductViewHolder(productItemBinding: ProductItemBinding) : RecyclerView.ViewHolder(productItemBinding.root) {
+    interface ProductClickListener {
+        fun onProductClickListener(product: Product)
+    }
+
+    inner class ProductViewHolder(productItemBinding: ProductItemBinding) : RecyclerView.ViewHolder(productItemBinding.root) {
         private val nomeTv = productItemBinding.productItemName
         private val descricaoTv= productItemBinding.productItemDescription
         private val valorTv = productItemBinding.productItemValue
         private val imageIv = productItemBinding.productItemImage
 
+        private lateinit var product: Product
+
+        init {
+            itemView.setOnClickListener {
+                productClickListener.onProductClickListener(product)
+            }
+        }
+
         fun bind(product: Product){
+            this.product = product
+
             nomeTv.text = product.name
             descricaoTv.text = product.description
             val productValueString = NumberFormat.getCurrencyInstance(Locale("pt", "br")).format(product.value)
