@@ -16,19 +16,11 @@ import java.util.Locale
 class ProductListAdapter(
     private val context: Context,
     var productList: List<Product> = emptyList(),
-//    var productClickListener: ProductClickListener = object: ProductClickListener {
-//        override fun onProductClickListener(product: Product) {
-//            Log.d("ProductListAdapter", "onProductClickListener: default listener")
-//        }
-//    }
-    var productClickListener: (product: Product) -> Unit = {}
+    var productClickListener: (product: Product) -> Unit = {},
+    var productLongClickListener: (product: Product,view: View) -> Unit = {_, _ -> }
 ) : RecyclerView.Adapter<ProductListAdapter.ProductViewHolder>() {
 
     private val productListDataSet = productList.toMutableList()
-
-//    interface ProductClickListener {
-//        fun onProductClickListener(product: Product)
-//    }
 
     inner class ProductViewHolder(productItemBinding: ProductItemBinding) : RecyclerView.ViewHolder(productItemBinding.root) {
         private val nomeTv = productItemBinding.productItemName
@@ -40,8 +32,11 @@ class ProductListAdapter(
 
         init {
             itemView.setOnClickListener {
-               // productClickListener.onProductClickListener(product)
                 productClickListener(product)
+            }
+            itemView.setOnLongClickListener {
+                productLongClickListener(product, it)
+                true
             }
         }
 

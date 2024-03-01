@@ -2,9 +2,12 @@ package br.com.alura.orgs.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import br.com.alura.orgs.R
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.database.dao.ProductDAO
 import br.com.alura.orgs.databinding.ActivityProductListBinding
@@ -26,13 +29,35 @@ class ProductListActivity : AppCompatActivity() {
         configureRecyclerView()
         configureFAB()
         productDAO = AppDatabase.getDBInstance(this).productDAO()
+
+
     }
 
     override fun onResume() {
         super.onResume()
         adapterProductList.productList = productDAO.getProductList()
+        adapterProductList.productLongClickListener =  { product, view -> 
+            val popupMenu = PopupMenu(this, view)
+            val menuInflater = popupMenu.menuInflater
+            menuInflater.inflate(R.menu.product_detail_menu, popupMenu.menu)
+            popupMenu.show()
+            popupMenu.setOnMenuItemClickListener {
+                when(it.itemId) {
+                    R.id.product_detail_menu_edit -> { true }
+                    R.id.product_detail_menu_delete -> { deleteProduct(product) }
+                    else -> true
+                }
+            }
+        }
         adapterProductList.refreshList(productDAO.getProductList())
     }
+
+    private fun deleteProduct(product: Product): Boolean{
+        productDAO.removeProduct(product)
+        adapterProductList.refreshList(productDAO.getProductList())
+        return true
+    }
+
 
     private fun configureFAB() {
         val fabCreateForm = productListBinding.activityProductListFab
