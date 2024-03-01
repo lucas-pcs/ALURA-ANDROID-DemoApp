@@ -36,7 +36,7 @@ class ProductListActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         adapterProductList.productList = productDAO.getProductList()
-        adapterProductList.productLongClickListener =  { product, view -> 
+        adapterProductList.productLongClickListener =  { product, view ->
             val popupMenu = PopupMenu(this, view)
             val menuInflater = popupMenu.menuInflater
             menuInflater.inflate(R.menu.product_detail_menu, popupMenu.menu)

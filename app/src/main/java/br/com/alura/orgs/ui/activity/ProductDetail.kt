@@ -1,8 +1,10 @@
 package br.com.alura.orgs.ui.activity
 
+import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import br.com.alura.orgs.R
@@ -28,19 +30,20 @@ class ProductDetail : AppCompatActivity() {
 
         productDAO = AppDatabase.getDBInstance(this).productDAO()
 
-        val product =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra("product", Product::class.java)
-        } else {
-            intent.getParcelableExtra<Product>("product")
-        }
+        val productReceived =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra("product", Product::class.java)
+            } else {
+                intent.getParcelableExtra<Product>("product")
+            }
 
-        product?.let {
-            this.product = product
+        productReceived?.let {
+            this.product = productReceived
             productDetailBinding.activityProductDetailImage.loadImage(it.imageURL)
             productDetailBinding.activityProductDetailName.text = it.name
             productDetailBinding.activityProductDetailDescription.text = it.description
-            productDetailBinding.activityProductDetailValue.text = NumberFormat.getCurrencyInstance(Locale("pt", "br")).format(it.value)
+            productDetailBinding.activityProductDetailValue.text =
+                NumberFormat.getCurrencyInstance(Locale("pt", "br")).format(it.value)
         }
 
     }
@@ -51,13 +54,18 @@ class ProductDetail : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
+        when (item.itemId) {
             R.id.product_detail_menu_edit -> {
-
+                Intent(this, ProductFormActivity::class.java).apply {
+                    putExtra("product",product)
+                    startActivity(this)
+                }
             }
             R.id.product_detail_menu_delete -> {
-                productDAO.removeProduct(product)
-                finish()
+                product.let {
+                    productDAO.removeProduct(it)
+                    finish()
+                }
             }
         }
         return super.onOptionsItemSelected(item)

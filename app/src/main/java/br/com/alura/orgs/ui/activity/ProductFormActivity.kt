@@ -1,6 +1,9 @@
 package br.com.alura.orgs.ui.activity
 
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityProductFormBinding
@@ -16,6 +19,7 @@ class ProductFormActivity : AppCompatActivity() {
     }
 
     private var url: String? = null
+    private var idReceived: Long = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +34,28 @@ class ProductFormActivity : AppCompatActivity() {
                 productFormBinding.activityProductFormImage.loadImage(url)
             }
         }
+
+        val productReceived = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra("product", Product::class.java)
+        } else {
+            intent.getParcelableExtra<Product>("product")
+        }
+
+        productReceived?.let {
+
+            title = "Edit product"
+            idReceived = it.id
+            productFormBinding.activityProductFormImage.loadImage(it.imageURL)
+            productFormBinding.activityProductFormTextName.setText(it.name)
+            productFormBinding.activityProductFormTextDescription.setText(it.description)
+            productFormBinding.activityProductFormTextValue.setText(it.value.toPlainString())
+            productFormBinding.activityProductFormSaveButton.text = "Update Product"
+
+            url = it.imageURL
+        }
+
+
+
     }
 
     private fun configureSaveButton() {
@@ -37,19 +63,24 @@ class ProductFormActivity : AppCompatActivity() {
         saveButton.setOnClickListener {
             val newProduct = createNewProduct()
             val productDAO = AppDatabase.getDBInstance(this).productDAO()
-            productDAO.addProduct(newProduct)
+
+            if(idReceived > 0) {
+                productDAO.updateProduct(newProduct)
+            } else {
+                productDAO.addProduct(newProduct)
+            }
             finish()
         }
     }
 
     private fun createNewProduct(): Product {
-        val fieldName = productFormBinding.activityProductFormTextinputedittextName
+        val fieldName = productFormBinding.activityProductFormTextName
         val name = fieldName.text.toString()
 
-        val fieldDescription = productFormBinding.activityProductFormTextinputedittextDescription
+        val fieldDescription = productFormBinding.activityProductFormTextDescription
         val description = fieldDescription.text.toString()
 
-        val fieldValue = productFormBinding.activityProductFormTextinputedittextValue
+        val fieldValue = productFormBinding.activityProductFormTextValue
         val valueInText = fieldValue.text.toString()
 
         val value = if (valueInText.isBlank()) {
@@ -59,6 +90,7 @@ class ProductFormActivity : AppCompatActivity() {
         }
 
         return Product(
+            id = idReceived,
             name = name,
             description = description,
             value = value,
