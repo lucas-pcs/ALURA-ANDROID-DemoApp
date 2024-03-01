@@ -10,6 +10,9 @@ import br.com.alura.orgs.ui.model.Product
 @Dao
 interface ProductDAO {
 
+    @Query("SELECT * FROM Product WHERE id = :id")
+    fun getProductById(id: Long): Product?
+
     @Query("SELECT * FROM Product")
     fun getProductList(): List<Product>
 
@@ -18,7 +21,6 @@ interface ProductDAO {
 
     @Update
     fun updateProduct(newProduct: Product)
-
     @Delete
     fun removeProduct(product: Product)
 
