@@ -15,7 +15,7 @@
         android:theme="@style/Theme.Orgs"
         tools:targetApi="31">
         <activity
-            android:name=".ProductDetail"
+            android:name=".ui.activity.ProductDetail"
             android:exported="false" />
         <activity
             android:name=".ui.activity.ProductFormActivity"
