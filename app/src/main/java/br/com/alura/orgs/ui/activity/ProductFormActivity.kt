@@ -1,17 +1,12 @@
 package br.com.alura.orgs.ui.activity
 
 import android.os.Bundle
-import android.util.Log
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import br.com.alura.orgs.R
-import br.com.alura.orgs.dao.ProductDAO
+import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityProductFormBinding
-import br.com.alura.orgs.databinding.ProductFormImageloadBinding
 import br.com.alura.orgs.ui.dialog.ProductFormImageDialog
 import br.com.alura.orgs.ui.extensions.loadImage
 import br.com.alura.orgs.ui.model.Product
-import coil.load
 import java.math.BigDecimal
 
 class ProductFormActivity : AppCompatActivity() {
@@ -21,8 +16,6 @@ class ProductFormActivity : AppCompatActivity() {
     }
 
     private var url: String? = null
-
-    private val productDAO = ProductDAO()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +36,7 @@ class ProductFormActivity : AppCompatActivity() {
         val saveButton = productFormBinding.activityProductFormSaveButton
         saveButton.setOnClickListener {
             val newProduct = createNewProduct()
+            val productDAO = AppDatabase.getDBInstance(this).productDAO()
             productDAO.addProduct(newProduct)
             finish()
         }

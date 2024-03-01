@@ -5,16 +5,16 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import br.com.alura.orgs.dao.ProductDAO
+import br.com.alura.orgs.database.AppDatabase
+import br.com.alura.orgs.database.dao.ProductDAO
 import br.com.alura.orgs.databinding.ActivityProductListBinding
 import br.com.alura.orgs.ui.model.Product
 import br.com.alura.orgs.ui.recyclerview.adapter.ProductListAdapter
 import java.math.BigDecimal
 
 class ProductListActivity : AppCompatActivity() {
-    private val productDAO = ProductDAO()
-    private val adapterProductList =
-        ProductListAdapter(context = this, productList = productDAO.getProductList())
+    private lateinit var productDAO: ProductDAO
+    private val adapterProductList = ProductListAdapter(context = this)
     private val productListBinding by lazy {
         ActivityProductListBinding.inflate(layoutInflater)
     }
@@ -25,19 +25,12 @@ class ProductListActivity : AppCompatActivity() {
 
         configureRecyclerView()
         configureFAB()
-
-        productDAO.addProduct(
-            Product(
-                name = "Cesta de frutas",
-                description = "Banana, maça e uva",
-                value = BigDecimal("19.83"),
-                imageURL = "https://images.pexels.com/photos/209339/pexels-photo-209339.jpeg"
-            )
-        )
+        productDAO = AppDatabase.getDBInstance(this).productDAO()
     }
 
     override fun onResume() {
         super.onResume()
+        adapterProductList.productList = productDAO.getProductList()
         adapterProductList.refreshList(productDAO.getProductList())
     }
 

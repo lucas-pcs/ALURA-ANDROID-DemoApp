@@ -15,7 +15,7 @@ import java.util.Locale
 
 class ProductListAdapter(
     private val context: Context,
-    productList: List<Product>,
+    var productList: List<Product> = emptyList(),
 //    var productClickListener: ProductClickListener = object: ProductClickListener {
 //        override fun onProductClickListener(product: Product) {
 //            Log.d("ProductListAdapter", "onProductClickListener: default listener")
