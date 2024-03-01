@@ -1,9 +1,6 @@
 package br.com.alura.orgs.ui.activity
 
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityProductFormBinding
@@ -17,45 +14,53 @@ class ProductFormActivity : AppCompatActivity() {
     private val productFormBinding by lazy {
         ActivityProductFormBinding.inflate(layoutInflater)
     }
+    private val productDAO by lazy {
+        AppDatabase.getDBInstance(this).productDAO()
+    }
 
     private var url: String? = null
-    private var idReceived: Long = 0L
+    private var productID: Long = 0L
+    private var product: Product? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         title = "Register new product"
         setContentView(productFormBinding.root)
         configureSaveButton()
+        configureImageButton()
+        getProduct()
+        editNonNullProduct()
+    }
 
+    private fun getProduct(){
+        productID = intent.getLongExtra(KEY_PRODUCT_ID, 0L)
+        product = productDAO.getProductById(productID)
+    }
+    private fun editNonNullProduct(){
+        product?.let {
+            title = "Edit product"
+            productID = it.id
+            url = it.imageURL
+            loadProductInfoOnScreen(it)
+        }
+    }
+
+    private fun loadProductInfoOnScreen(product: Product){
+        productFormBinding.activityProductFormImage.loadImage(product.imageURL)
+        productFormBinding.activityProductFormTextName.setText(product.name)
+        productFormBinding.activityProductFormTextDescription.setText(product.description)
+        productFormBinding.activityProductFormTextValue.setText(product.value.toPlainString())
+        productFormBinding.activityProductFormSaveButton.text = "Update Product"
+    }
+
+    private fun configureImageButton(){
         val imageButton = productFormBinding.activityProductFormImage
         imageButton.setOnClickListener {
             ProductFormImageDialog(this).showImageDialog(url) {
-                imageURL: String? ->  url = imageURL
+                    imageURL: String? ->  url = imageURL
                 productFormBinding.activityProductFormImage.loadImage(url)
             }
         }
-
-        val productReceived = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra("product", Product::class.java)
-        } else {
-            intent.getParcelableExtra<Product>("product")
-        }
-
-        productReceived?.let {
-
-            title = "Edit product"
-            idReceived = it.id
-            productFormBinding.activityProductFormImage.loadImage(it.imageURL)
-            productFormBinding.activityProductFormTextName.setText(it.name)
-            productFormBinding.activityProductFormTextDescription.setText(it.description)
-            productFormBinding.activityProductFormTextValue.setText(it.value.toPlainString())
-            productFormBinding.activityProductFormSaveButton.text = "Update Product"
-
-            url = it.imageURL
-        }
-
-
-
     }
 
     private fun configureSaveButton() {
@@ -64,11 +69,12 @@ class ProductFormActivity : AppCompatActivity() {
             val newProduct = createNewProduct()
             val productDAO = AppDatabase.getDBInstance(this).productDAO()
 
-            if(idReceived > 0) {
-                productDAO.updateProduct(newProduct)
-            } else {
-                productDAO.addProduct(newProduct)
-            }
+//            if(productID > 0) {
+//                productDAO.updateProduct(newProduct)
+//            } else {
+//                productDAO.addProduct(newProduct)
+//            }
+            productDAO.addProduct(newProduct)
             finish()
         }
     }
@@ -90,7 +96,7 @@ class ProductFormActivity : AppCompatActivity() {
         }
 
         return Product(
-            id = idReceived,
+            id = productID,
             name = name,
             description = description,
             value = value,

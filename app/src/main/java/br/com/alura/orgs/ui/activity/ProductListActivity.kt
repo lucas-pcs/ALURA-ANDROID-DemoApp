@@ -71,16 +71,9 @@ class ProductListActivity : AppCompatActivity() {
         val productListRecyclerView: RecyclerView =
             productListBinding.activityProductListRecyclerView
         productListRecyclerView.adapter = adapterProductList
-//        adapterProductList.productClickListener = object: ProductListAdapter.ProductClickListener {
-//            override fun onProductClickListener(product: Product){
-//                val goToProductDetail = Intent(this@ProductListActivity, ProductDetail::class.java)
-//                goToProductDetail.putExtra("product",product)
-//                startActivity(goToProductDetail)
-//            }
-//        }
         adapterProductList.productClickListener = { product: Product ->
             val goToProductDetail = Intent(this@ProductListActivity, ProductDetail::class.java)
-            goToProductDetail.putExtra("product", product)
+            goToProductDetail.putExtra(KEY_PRODUCT_ID, product.id)
             startActivity(goToProductDetail)
         }
         productListRecyclerView.layoutManager = LinearLayoutManager(this)

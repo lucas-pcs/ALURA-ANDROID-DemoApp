@@ -1,7 +1,6 @@
 package br.com.alura.orgs.ui.activity
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -22,36 +21,24 @@ class ProductDetail : AppCompatActivity() {
         AppDatabase.getDBInstance(this).productDAO()
     }
 
-    private lateinit var product: Product
-    private var productID: Long? = null
+    private var product: Product? = null
+    private var productID: Long = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(productDetailBinding.root)
 
-        val productReceived =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                intent.getParcelableExtra("product", Product::class.java)
-            } else {
-                intent.getParcelableExtra<Product>("product")
-            }
-
-        productReceived?.let {
-            this.product = it
-            this.productID = it.id
-        } ?: finish()
-
+        // load productID from product list activity
+        productID = intent.getLongExtra(KEY_PRODUCT_ID, 0L)
     }
 
     override fun onResume() {
         super.onResume()
-        productID?.let {
-            val productById = productDAO.getProductById(it)
-            fillProductDetailScreen(productById)
-        }
+        fillProductDetailScreen()
     }
 
-    private fun fillProductDetailScreen(product: Product?){
+    private fun fillProductDetailScreen(){
+        product = productDAO.getProductById(productID)
         product?.let {
             productDetailBinding.activityProductDetailImage.loadImage(it.imageURL)
             productDetailBinding.activityProductDetailName.text = it.name
@@ -68,19 +55,22 @@ class ProductDetail : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.product_detail_menu_edit -> {
-                Intent(this, ProductFormActivity::class.java).apply {
-                    putExtra("product",product)
-                    startActivity(this)
-                }
-            }
-            R.id.product_detail_menu_delete -> {
-                product.let {
-                    productDAO.removeProduct(it)
-                    finish()
-                }
-            }
+            R.id.product_detail_menu_edit -> { goToFormActivity() }
+            R.id.product_detail_menu_delete -> { deleteProduct() }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun goToFormActivity(){
+        Intent(this, ProductFormActivity::class.java).apply {
+            putExtra(KEY_PRODUCT_ID, product?.id)
+            startActivity(this)
+        }
+    }
+    private fun deleteProduct(){
+        product?.let {
+            productDAO.removeProduct(it)
+            finish()
+        }
     }
 }
