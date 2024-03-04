@@ -17,6 +17,24 @@ interface ProductDAO {
     @Query("SELECT * FROM Product")
     fun getProductList(): List<Product>
 
+    @Query("SELECT * FROM Product ORDER BY name DESC")
+    fun getProductListByNameDesc(): List<Product>
+
+    @Query("SELECT * FROM Product ORDER BY name ASC")
+    fun getProductListByNameAsc(): List<Product>
+
+    @Query("SELECT * FROM Product ORDER BY description DESC")
+    fun getProductListByDescDesc(): List<Product>
+
+    @Query("SELECT * FROM Product ORDER BY description ASC")
+    fun getProductListByDescAsc(): List<Product>
+
+    @Query("SELECT * FROM Product ORDER BY value DESC")
+    fun getProductListByValueDesc(): List<Product>
+
+    @Query("SELECT * FROM Product ORDER BY value ASC")
+    fun getProductListByValueAsc(): List<Product>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addProduct(product: Product)
 

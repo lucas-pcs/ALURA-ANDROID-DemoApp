@@ -3,6 +3,8 @@ package br.com.alura.orgs.ui.activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,6 +16,7 @@ import br.com.alura.orgs.databinding.ActivityProductListBinding
 import br.com.alura.orgs.ui.model.Product
 import br.com.alura.orgs.ui.recyclerview.adapter.ProductListAdapter
 import java.math.BigDecimal
+import java.util.Collections
 
 class ProductListActivity : AppCompatActivity() {
     private lateinit var productDAO: ProductDAO
@@ -31,6 +34,26 @@ class ProductListActivity : AppCompatActivity() {
         productDAO = AppDatabase.getDBInstance(this).productDAO()
 
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.product_list_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.product_list_menu_name_desc -> { adapterProductList.refreshList(productDAO.getProductListByNameDesc()) }
+            R.id.product_list_menu_name_asc -> { adapterProductList.refreshList(productDAO.getProductListByNameAsc()) }
+            R.id.product_list_menu_desc_desc -> { adapterProductList.refreshList(productDAO.getProductListByDescDesc()) }
+            R.id.product_list_menu_desc_asc -> { adapterProductList.refreshList(productDAO.getProductListByDescAsc()) }
+            R.id.product_list_menu_value_desc -> { adapterProductList.refreshList(productDAO.getProductListByValueDesc()) }
+            R.id.product_list_menu_value_asc -> { adapterProductList.refreshList(productDAO.getProductListByValueAsc()) }
+            R.id.product_list_menu_noorder -> { adapterProductList.refreshList(productDAO.getProductList()) }
+            else -> {
+                Log.d("ProductListActivity", "onOptionsItemSelected: no options selected")}
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onResume() {
