@@ -10,6 +10,10 @@ import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityProductDetailBinding
 import br.com.alura.orgs.ui.extensions.loadImage
 import br.com.alura.orgs.ui.model.Product
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -19,6 +23,10 @@ class ProductDetail : AppCompatActivity() {
     }
     private val productDAO by lazy {
         AppDatabase.getDBInstance(this).productDAO()
+    }
+
+    private val scope by lazy {
+        CoroutineScope(Dispatchers.IO)
     }
 
     private var product: Product? = null
@@ -38,14 +46,18 @@ class ProductDetail : AppCompatActivity() {
     }
 
     private fun fillProductDetailScreen(){
-        product = productDAO.getProductById(productID)
-        product?.let {
-            productDetailBinding.activityProductDetailImage.loadImage(it.imageURL)
-            productDetailBinding.activityProductDetailName.text = it.name
-            productDetailBinding.activityProductDetailDescription.text = it.description
-            productDetailBinding.activityProductDetailValue.text =
-                NumberFormat.getCurrencyInstance(Locale("pt", "br")).format(it.value)
-        } ?: finish()
+        scope.launch {
+            product = productDAO.getProductById(productID)
+            product?.let {
+                withContext(Dispatchers.Main){
+                    productDetailBinding.activityProductDetailImage.loadImage(it.imageURL)
+                    productDetailBinding.activityProductDetailName.text = it.name
+                    productDetailBinding.activityProductDetailDescription.text = it.description
+                    productDetailBinding.activityProductDetailValue.text =
+                        NumberFormat.getCurrencyInstance(Locale("pt", "br")).format(it.value)
+                }
+            } ?: finish()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -68,9 +80,11 @@ class ProductDetail : AppCompatActivity() {
         }
     }
     private fun deleteProduct(){
-        product?.let {
-            productDAO.removeProduct(it)
-            finish()
+        scope.launch {
+            product?.let {
+                productDAO.removeProduct(it)
+                finish()
+            }
         }
     }
 }

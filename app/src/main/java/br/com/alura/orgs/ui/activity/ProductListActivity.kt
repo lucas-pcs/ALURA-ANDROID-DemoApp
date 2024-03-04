@@ -15,25 +15,29 @@ import br.com.alura.orgs.database.dao.ProductDAO
 import br.com.alura.orgs.databinding.ActivityProductListBinding
 import br.com.alura.orgs.ui.model.Product
 import br.com.alura.orgs.ui.recyclerview.adapter.ProductListAdapter
-import java.math.BigDecimal
-import java.util.Collections
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ProductListActivity : AppCompatActivity() {
-    private lateinit var productDAO: ProductDAO
     private val adapterProductList = ProductListAdapter(context = this)
+    private val productDAO by lazy {
+        AppDatabase.getDBInstance(this).productDAO()
+    }
     private val productListBinding by lazy {
         ActivityProductListBinding.inflate(layoutInflater)
     }
+    private val scope by lazy {
+        CoroutineScope(Dispatchers.IO)
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(productListBinding.root)
-
         configureRecyclerView()
         configureFAB()
-        productDAO = AppDatabase.getDBInstance(this).productDAO()
-
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -42,23 +46,44 @@ class ProductListActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.product_list_menu_name_desc -> { adapterProductList.refreshList(productDAO.getProductListByNameDesc()) }
-            R.id.product_list_menu_name_asc -> { adapterProductList.refreshList(productDAO.getProductListByNameAsc()) }
-            R.id.product_list_menu_desc_desc -> { adapterProductList.refreshList(productDAO.getProductListByDescDesc()) }
-            R.id.product_list_menu_desc_asc -> { adapterProductList.refreshList(productDAO.getProductListByDescAsc()) }
-            R.id.product_list_menu_value_desc -> { adapterProductList.refreshList(productDAO.getProductListByValueDesc()) }
-            R.id.product_list_menu_value_asc -> { adapterProductList.refreshList(productDAO.getProductListByValueAsc()) }
-            R.id.product_list_menu_noorder -> { adapterProductList.refreshList(productDAO.getProductList()) }
-            else -> {
-                Log.d("ProductListActivity", "onOptionsItemSelected: no options selected")}
-        }
+        updateProductList(itemId = item.itemId)
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun updateProductList(itemId: Int){
+        var productListSorted: List<Product>? = null
+        scope.launch {
+            productListSorted = with(productDAO){
+                when(itemId){
+                    R.id.product_list_menu_name_asc -> { this.getProductListByNameAsc() }
+                    R.id.product_list_menu_name_desc -> { this.getProductListByNameDesc() }
+                    R.id.product_list_menu_desc_desc -> {  this.getProductListByDescDesc() }
+                    R.id.product_list_menu_desc_asc -> {  this.getProductListByDescAsc() }
+                    R.id.product_list_menu_value_desc -> {  this.getProductListByValueDesc() }
+                    R.id.product_list_menu_value_asc -> {  this.getProductListByValueAsc() }
+                    R.id.product_list_menu_noorder -> {  this.getProductList() }
+                    else -> null
+                }
+            }
+            withContext(Dispatchers.Main){
+                productListSorted?.let {
+                    withContext(Dispatchers.Main){
+                        adapterProductList.refreshList(it)
+                    }
+                }
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        adapterProductList.productList = productDAO.getProductList()
+        scope.launch {
+            val productList = productDAO.getProductList()
+            adapterProductList.productList = productList
+            withContext(Dispatchers.Main){
+                adapterProductList.refreshList(productList)
+            }
+        }
         adapterProductList.productLongClickListener =  { product, view ->
             val popupMenu = PopupMenu(this, view)
             val menuInflater = popupMenu.menuInflater
@@ -72,12 +97,16 @@ class ProductListActivity : AppCompatActivity() {
                 }
             }
         }
-        adapterProductList.refreshList(productDAO.getProductList())
     }
 
     private fun deleteProduct(product: Product): Boolean{
-        productDAO.removeProduct(product)
-        adapterProductList.refreshList(productDAO.getProductList())
+        scope.launch {
+            productDAO.removeProduct(product)
+            val productListUpdated = productDAO.getProductList()
+            withContext(Dispatchers.Main){
+                adapterProductList.refreshList(productListUpdated)
+            }
+        }
         return true
     }
 

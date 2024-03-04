@@ -7,6 +7,10 @@ import br.com.alura.orgs.databinding.ActivityProductFormBinding
 import br.com.alura.orgs.ui.dialog.ProductFormImageDialog
 import br.com.alura.orgs.ui.extensions.loadImage
 import br.com.alura.orgs.ui.model.Product
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 
 class ProductFormActivity : AppCompatActivity() {
@@ -16,6 +20,10 @@ class ProductFormActivity : AppCompatActivity() {
     }
     private val productDAO by lazy {
         AppDatabase.getDBInstance(this).productDAO()
+    }
+
+    private val scope by lazy {
+        CoroutineScope(Dispatchers.IO)
     }
 
     private var url: String? = null
@@ -29,19 +37,20 @@ class ProductFormActivity : AppCompatActivity() {
         configureSaveButton()
         configureImageButton()
         getProduct()
-        editNonNullProduct()
     }
 
     private fun getProduct(){
         productID = intent.getLongExtra(KEY_PRODUCT_ID, 0L)
-        product = productDAO.getProductById(productID)
-    }
-    private fun editNonNullProduct(){
-        product?.let {
-            title = "Edit product"
-            productID = it.id
-            url = it.imageURL
-            loadProductInfoOnScreen(it)
+        scope.launch {
+            product = productDAO.getProductById(productID)
+            product?.let {
+                withContext(Dispatchers.Main){
+                    title = "Edit product"
+                    productID = it.id
+                    url = it.imageURL
+                    loadProductInfoOnScreen(it)
+                }
+            }
         }
     }
 
@@ -67,14 +76,14 @@ class ProductFormActivity : AppCompatActivity() {
         val saveButton = productFormBinding.activityProductFormSaveButton
         saveButton.setOnClickListener {
             val newProduct = createNewProduct()
-            val productDAO = AppDatabase.getDBInstance(this).productDAO()
-
 //            if(productID > 0) {
 //                productDAO.updateProduct(newProduct)
 //            } else {
 //                productDAO.addProduct(newProduct)
 //            }
-            productDAO.addProduct(newProduct)
+            scope.launch {
+                productDAO.addProduct(newProduct)
+            }
             finish()
         }
     }

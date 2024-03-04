@@ -20,7 +20,6 @@ abstract class AppDatabase: RoomDatabase() {
         fun getDBInstance(context: Context): AppDatabase {
             if(::db.isInitialized) return db
             return Room.databaseBuilder(context, AppDatabase::class.java, "orgs.db")
-                .allowMainThreadQueries()
                 .build().also {
                     db = it
                     Log.d("AppDatabase", "getDBInstance: db instance created")
