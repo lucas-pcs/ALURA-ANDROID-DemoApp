@@ -63,6 +63,7 @@ class ProductListActivity : AppCompatActivity() {
                     R.id.product_list_menu_value_asc -> {  this.getProductListByValueAsc() }
                     R.id.product_list_menu_noorder -> {  this.getProductList() }
                     else -> null
+                    
                 }
             }
             withContext(Dispatchers.Main){
