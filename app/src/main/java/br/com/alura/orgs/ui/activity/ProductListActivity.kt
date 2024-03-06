@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +16,7 @@ import br.com.alura.orgs.database.dao.ProductDAO
 import br.com.alura.orgs.databinding.ActivityProductListBinding
 import br.com.alura.orgs.ui.model.Product
 import br.com.alura.orgs.ui.recyclerview.adapter.ProductListAdapter
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,7 +31,7 @@ class ProductListActivity : AppCompatActivity() {
         ActivityProductListBinding.inflate(layoutInflater)
     }
     private val scope by lazy {
-        CoroutineScope(Dispatchers.IO)
+        CoroutineScope(Dispatchers.Main)
     }
 
 
@@ -38,6 +40,23 @@ class ProductListActivity : AppCompatActivity() {
         setContentView(productListBinding.root)
         configureRecyclerView()
         configureFAB()
+        configurePopupMenu()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        scope.launch {
+            val productList: List<Product>?
+            withContext(Dispatchers.IO){
+                productList = productDAO.getProductList()
+            }
+            productList?.let {
+                adapterProductList.productList = it
+                adapterProductList.refreshList(it)
+            }
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -52,52 +71,61 @@ class ProductListActivity : AppCompatActivity() {
 
     private fun updateProductList(itemId: Int){
         var productListSorted: List<Product>? = null
-        scope.launch {
-            productListSorted = with(productDAO){
-                when(itemId){
-                    R.id.product_list_menu_name_asc -> { this.getProductListByNameAsc() }
-                    R.id.product_list_menu_name_desc -> { this.getProductListByNameDesc() }
-                    R.id.product_list_menu_desc_desc -> {  this.getProductListByDescDesc() }
-                    R.id.product_list_menu_desc_asc -> {  this.getProductListByDescAsc() }
-                    R.id.product_list_menu_value_desc -> {  this.getProductListByValueDesc() }
-                    R.id.product_list_menu_value_asc -> {  this.getProductListByValueAsc() }
-                    R.id.product_list_menu_noorder -> {  this.getProductList() }
-                    else -> null
-                    
+        val handlerMenuSort = CoroutineExceptionHandler { _, throwable ->
+            throwable.printStackTrace()
+            // TODO: use a more specific exception
+            throw Exception("Menu Sort list exception")
+        }
+        scope.launch(handlerMenuSort) {
+
+            withContext(Dispatchers.IO){
+                productListSorted = with(productDAO){
+                    when(itemId){
+                        R.id.product_list_menu_name_asc -> { this.getProductListByNameAsc() }
+                        R.id.product_list_menu_name_desc -> { this.getProductListByNameDesc() }
+                        R.id.product_list_menu_desc_desc -> { this.getProductListByDescDesc() }
+                        R.id.product_list_menu_desc_asc -> { this.getProductListByDescAsc() }
+                        R.id.product_list_menu_value_desc -> { this.getProductListByValueDesc() }
+                        R.id.product_list_menu_value_asc -> { this.getProductListByValueAsc() }
+                        R.id.product_list_menu_noorder -> { this.getProductList() }
+                        else -> null
+                    }
                 }
             }
-            withContext(Dispatchers.Main){
+
                 productListSorted?.let {
                     withContext(Dispatchers.Main){
                         adapterProductList.refreshList(it)
                     }
                 }
-            }
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        scope.launch {
-            val productList = productDAO.getProductList()
-            adapterProductList.productList = productList
-            withContext(Dispatchers.Main){
-                adapterProductList.refreshList(productList)
-            }
-        }
-        adapterProductList.productLongClickListener =  { product, view ->
-            val popupMenu = PopupMenu(this, view)
-            val menuInflater = popupMenu.menuInflater
-            menuInflater.inflate(R.menu.product_detail_menu, popupMenu.menu)
+    private fun configurePopupMenu() {
+        adapterProductList.productLongClickListener = { product, view ->
+            val popupMenu = popupMenu(view)
             popupMenu.show()
             popupMenu.setOnMenuItemClickListener {
-                when(it.itemId) {
-                    R.id.product_detail_menu_edit -> { true }
-                    R.id.product_detail_menu_delete -> { deleteProduct(product) }
+                when (it.itemId) {
+                    R.id.product_detail_menu_edit -> {
+                        true
+                    }
+
+                    R.id.product_detail_menu_delete -> {
+                        deleteProduct(product)
+                    }
+
                     else -> true
                 }
             }
         }
+    }
+
+    private fun popupMenu(view: View): PopupMenu {
+        val popupMenu = PopupMenu(this, view)
+        val menuInflater = popupMenu.menuInflater
+        menuInflater.inflate(R.menu.product_detail_menu, popupMenu.menu)
+        return popupMenu
     }
 
     private fun deleteProduct(product: Product): Boolean{

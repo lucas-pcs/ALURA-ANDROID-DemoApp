@@ -7,6 +7,7 @@ import br.com.alura.orgs.databinding.ActivityProductFormBinding
 import br.com.alura.orgs.ui.dialog.ProductFormImageDialog
 import br.com.alura.orgs.ui.extensions.loadImage
 import br.com.alura.orgs.ui.model.Product
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,7 +24,7 @@ class ProductFormActivity : AppCompatActivity() {
     }
 
     private val scope by lazy {
-        CoroutineScope(Dispatchers.IO)
+        CoroutineScope(Dispatchers.Main)
     }
 
     private var url: String? = null
@@ -41,15 +42,19 @@ class ProductFormActivity : AppCompatActivity() {
 
     private fun getProduct(){
         productID = intent.getLongExtra(KEY_PRODUCT_ID, 0L)
-        scope.launch {
-            product = productDAO.getProductById(productID)
+        val handlerGetProduct = CoroutineExceptionHandler { _, throwable ->
+            throwable.printStackTrace()
+            throw Exception("Fail to get product or update UI")
+        }
+        scope.launch(handlerGetProduct) {
+            withContext(Dispatchers.IO){
+                product = productDAO.getProductById(productID)
+            }
             product?.let {
-                withContext(Dispatchers.Main){
-                    title = "Edit product"
-                    productID = it.id
-                    url = it.imageURL
-                    loadProductInfoOnScreen(it)
-                }
+                title = "Edit product"
+                productID = it.id
+                url = it.imageURL
+                loadProductInfoOnScreen(it)
             }
         }
     }
@@ -76,13 +81,14 @@ class ProductFormActivity : AppCompatActivity() {
         val saveButton = productFormBinding.activityProductFormSaveButton
         saveButton.setOnClickListener {
             val newProduct = createNewProduct()
-//            if(productID > 0) {
-//                productDAO.updateProduct(newProduct)
-//            } else {
-//                productDAO.addProduct(newProduct)
-//            }
-            scope.launch {
-                productDAO.addProduct(newProduct)
+            val handlerAddProduct = CoroutineExceptionHandler { _, throwable ->
+                throwable.printStackTrace()
+                throw Exception("Fail to add product on DB")
+            }
+            scope.launch(handlerAddProduct) {
+                withContext(Dispatchers.IO){
+                    productDAO.addProduct(newProduct)
+                }
             }
             finish()
         }

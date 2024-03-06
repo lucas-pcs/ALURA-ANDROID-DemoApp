@@ -26,7 +26,7 @@ class ProductDetail : AppCompatActivity() {
     }
 
     private val scope by lazy {
-        CoroutineScope(Dispatchers.IO)
+        CoroutineScope(Dispatchers.Main)
     }
 
     private var product: Product? = null
@@ -47,15 +47,15 @@ class ProductDetail : AppCompatActivity() {
 
     private fun fillProductDetailScreen(){
         scope.launch {
-            product = productDAO.getProductById(productID)
+            withContext(Dispatchers.IO){
+                product = productDAO.getProductById(productID)
+            }
             product?.let {
-                withContext(Dispatchers.Main){
-                    productDetailBinding.activityProductDetailImage.loadImage(it.imageURL)
-                    productDetailBinding.activityProductDetailName.text = it.name
-                    productDetailBinding.activityProductDetailDescription.text = it.description
-                    productDetailBinding.activityProductDetailValue.text =
-                        NumberFormat.getCurrencyInstance(Locale("pt", "br")).format(it.value)
-                }
+                productDetailBinding.activityProductDetailImage.loadImage(it.imageURL)
+                productDetailBinding.activityProductDetailName.text = it.name
+                productDetailBinding.activityProductDetailDescription.text = it.description
+                productDetailBinding.activityProductDetailValue.text =
+                    NumberFormat.getCurrencyInstance(Locale("pt", "br")).format(it.value)
             } ?: finish()
         }
     }
@@ -81,10 +81,12 @@ class ProductDetail : AppCompatActivity() {
     }
     private fun deleteProduct(){
         scope.launch {
-            product?.let {
-                productDAO.removeProduct(it)
-                finish()
+            withContext(Dispatchers.IO){
+                product?.let {
+                    productDAO.removeProduct(it)
+                }
             }
+            finish()
         }
     }
 }
