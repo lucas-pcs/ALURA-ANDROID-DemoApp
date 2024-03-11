@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import br.com.alura.orgs.R
@@ -30,9 +31,9 @@ class ProductListActivity : AppCompatActivity() {
     private val productListBinding by lazy {
         ActivityProductListBinding.inflate(layoutInflater)
     }
-    private val scope by lazy {
-        CoroutineScope(Dispatchers.Main)
-    }
+//    private val scope by lazy {
+//        CoroutineScope(Dispatchers.Main)
+//    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +47,7 @@ class ProductListActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        scope.launch {
+        lifecycleScope.launch {
             val productList: List<Product>?
             withContext(Dispatchers.IO){
                 productList = productDAO.getProductList()
@@ -76,7 +77,7 @@ class ProductListActivity : AppCompatActivity() {
             // TODO: use a more specific exception
             throw Exception("Menu Sort list exception")
         }
-        scope.launch(handlerMenuSort) {
+        lifecycleScope.launch(handlerMenuSort) {
 
             withContext(Dispatchers.IO){
                 productListSorted = with(productDAO){
@@ -129,7 +130,7 @@ class ProductListActivity : AppCompatActivity() {
     }
 
     private fun deleteProduct(product: Product): Boolean{
-        scope.launch {
+        lifecycleScope.launch {
             productDAO.removeProduct(product)
             val productListUpdated = productDAO.getProductList()
             withContext(Dispatchers.Main){

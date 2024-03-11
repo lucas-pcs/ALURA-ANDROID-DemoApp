@@ -2,6 +2,7 @@ package br.com.alura.orgs.ui.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityProductFormBinding
 import br.com.alura.orgs.ui.dialog.ProductFormImageDialog
@@ -23,9 +24,9 @@ class ProductFormActivity : AppCompatActivity() {
         AppDatabase.getDBInstance(this).productDAO()
     }
 
-    private val scope by lazy {
-        CoroutineScope(Dispatchers.Main)
-    }
+//    private val scope by lazy {
+//        CoroutineScope(Dispatchers.Main)
+//    }
 
     private var url: String? = null
     private var productID: Long = 0L
@@ -46,7 +47,7 @@ class ProductFormActivity : AppCompatActivity() {
             throwable.printStackTrace()
             throw Exception("Fail to get product or update UI")
         }
-        scope.launch(handlerGetProduct) {
+        lifecycleScope.launch(handlerGetProduct) {
             withContext(Dispatchers.IO){
                 product = productDAO.getProductById(productID)
             }
@@ -85,7 +86,7 @@ class ProductFormActivity : AppCompatActivity() {
                 throwable.printStackTrace()
                 throw Exception("Fail to add product on DB")
             }
-            scope.launch(handlerAddProduct) {
+            lifecycleScope.launch(handlerAddProduct) {
                 withContext(Dispatchers.IO){
                     productDAO.addProduct(newProduct)
                 }

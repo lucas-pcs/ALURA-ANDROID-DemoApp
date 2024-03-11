@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import br.com.alura.orgs.R
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityProductDetailBinding
@@ -25,9 +26,9 @@ class ProductDetail : AppCompatActivity() {
         AppDatabase.getDBInstance(this).productDAO()
     }
 
-    private val scope by lazy {
-        CoroutineScope(Dispatchers.Main)
-    }
+//    private val scope by lazy {
+//        CoroutineScope(Dispatchers.Main)
+//    }
 
     private var product: Product? = null
     private var productID: Long = 0L
@@ -46,7 +47,7 @@ class ProductDetail : AppCompatActivity() {
     }
 
     private fun fillProductDetailScreen(){
-        scope.launch {
+        lifecycleScope.launch {
             withContext(Dispatchers.IO){
                 product = productDAO.getProductById(productID)
             }
@@ -80,7 +81,7 @@ class ProductDetail : AppCompatActivity() {
         }
     }
     private fun deleteProduct(){
-        scope.launch {
+        lifecycleScope.launch {
             withContext(Dispatchers.IO){
                 product?.let {
                     productDAO.removeProduct(it)
