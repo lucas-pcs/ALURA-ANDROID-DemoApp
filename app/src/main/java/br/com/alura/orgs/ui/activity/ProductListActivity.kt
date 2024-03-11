@@ -2,7 +2,6 @@ package br.com.alura.orgs.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -13,15 +12,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import br.com.alura.orgs.R
 import br.com.alura.orgs.database.AppDatabase
-import br.com.alura.orgs.database.dao.ProductDAO
 import br.com.alura.orgs.databinding.ActivityProductListBinding
 import br.com.alura.orgs.ui.model.Product
 import br.com.alura.orgs.ui.recyclerview.adapter.ProductListAdapter
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class ProductListActivity : AppCompatActivity() {
     private val adapterProductList = ProductListAdapter(context = this)
@@ -42,22 +37,12 @@ class ProductListActivity : AppCompatActivity() {
         configureRecyclerView()
         configureFAB()
         configurePopupMenu()
-    }
-
-    override fun onResume() {
-        super.onResume()
 
         lifecycleScope.launch {
-            val productList: List<Product>?
-            withContext(Dispatchers.IO){
-                productList = productDAO.getProductList()
-            }
-            productList?.let {
-                adapterProductList.productList = it
+            productDAO.getProductList().collect {
                 adapterProductList.refreshList(it)
             }
         }
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -70,7 +55,7 @@ class ProductListActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun updateProductList(itemId: Int){
+    private fun updateProductList(itemId: Int) {
         var productListSorted: List<Product>? = null
         val handlerMenuSort = CoroutineExceptionHandler { _, throwable ->
             throwable.printStackTrace()
@@ -79,26 +64,44 @@ class ProductListActivity : AppCompatActivity() {
         }
         lifecycleScope.launch(handlerMenuSort) {
 
-            withContext(Dispatchers.IO){
-                productListSorted = with(productDAO){
-                    when(itemId){
-                        R.id.product_list_menu_name_asc -> { this.getProductListByNameAsc() }
-                        R.id.product_list_menu_name_desc -> { this.getProductListByNameDesc() }
-                        R.id.product_list_menu_desc_desc -> { this.getProductListByDescDesc() }
-                        R.id.product_list_menu_desc_asc -> { this.getProductListByDescAsc() }
-                        R.id.product_list_menu_value_desc -> { this.getProductListByValueDesc() }
-                        R.id.product_list_menu_value_asc -> { this.getProductListByValueAsc() }
-                        R.id.product_list_menu_noorder -> { this.getProductList() }
-                        else -> null
+            productListSorted = with(productDAO) {
+                when (itemId) {
+                    R.id.product_list_menu_name_asc -> {
+                        this.getProductListByNameAsc()
                     }
+
+                    R.id.product_list_menu_name_desc -> {
+                        this.getProductListByNameDesc()
+                    }
+
+                    R.id.product_list_menu_desc_desc -> {
+                        this.getProductListByDescDesc()
+                    }
+
+                    R.id.product_list_menu_desc_asc -> {
+                        this.getProductListByDescAsc()
+                    }
+
+                    R.id.product_list_menu_value_desc -> {
+                        this.getProductListByValueDesc()
+                    }
+
+                    R.id.product_list_menu_value_asc -> {
+                        this.getProductListByValueAsc()
+                    }
+
+                    R.id.product_list_menu_noorder -> {
+                        this.getProductList().collect { productListSorted = it }
+                        productListSorted
+                    }
+
+                    else -> null
                 }
             }
 
-                productListSorted?.let {
-                    withContext(Dispatchers.Main){
-                        adapterProductList.refreshList(it)
-                    }
-                }
+            productListSorted?.let {
+                adapterProductList.refreshList(it)
+            }
         }
     }
 
@@ -129,12 +132,12 @@ class ProductListActivity : AppCompatActivity() {
         return popupMenu
     }
 
-    private fun deleteProduct(product: Product): Boolean{
+    private fun deleteProduct(product: Product): Boolean {
         lifecycleScope.launch {
             productDAO.removeProduct(product)
-            val productListUpdated = productDAO.getProductList()
-            withContext(Dispatchers.Main){
-                adapterProductList.refreshList(productListUpdated)
+
+            productDAO.getProductList().collect {
+                adapterProductList.refreshList(it)
             }
         }
         return true

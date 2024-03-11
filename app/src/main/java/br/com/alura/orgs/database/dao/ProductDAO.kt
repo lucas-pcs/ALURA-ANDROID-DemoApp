@@ -7,40 +7,41 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import br.com.alura.orgs.ui.model.Product
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProductDAO {
 
     @Query("SELECT * FROM Product WHERE id = :id")
-    fun getProductById(id: Long): Product?
+    fun getProductById(id: Long): Flow<Product?>
 
     @Query("SELECT * FROM Product")
-    fun getProductList(): List<Product>
+    fun getProductList(): Flow<List<Product>>
 
     @Query("SELECT * FROM Product ORDER BY name DESC")
-    fun getProductListByNameDesc(): List<Product>
+    suspend fun getProductListByNameDesc(): List<Product>
 
     @Query("SELECT * FROM Product ORDER BY name ASC")
-    fun getProductListByNameAsc(): List<Product>
+    suspend fun getProductListByNameAsc(): List<Product>
 
     @Query("SELECT * FROM Product ORDER BY description DESC")
-    fun getProductListByDescDesc(): List<Product>
+    suspend fun getProductListByDescDesc(): List<Product>
 
     @Query("SELECT * FROM Product ORDER BY description ASC")
-    fun getProductListByDescAsc(): List<Product>
+    suspend fun getProductListByDescAsc(): List<Product>
 
     @Query("SELECT * FROM Product ORDER BY value DESC")
-    fun getProductListByValueDesc(): List<Product>
+    suspend fun getProductListByValueDesc(): List<Product>
 
     @Query("SELECT * FROM Product ORDER BY value ASC")
-    fun getProductListByValueAsc(): List<Product>
+    suspend fun getProductListByValueAsc(): List<Product>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addProduct(product: Product)
+    suspend fun addProduct(product: Product)
 
     @Update
-    fun updateProduct(newProduct: Product)
+    suspend fun updateProduct(newProduct: Product)
     @Delete
-    fun removeProduct(product: Product)
+    suspend fun removeProduct(product: Product)
 
 }

@@ -11,10 +11,7 @@ import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityProductDetailBinding
 import br.com.alura.orgs.ui.extensions.loadImage
 import br.com.alura.orgs.ui.model.Product
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -46,18 +43,19 @@ class ProductDetail : AppCompatActivity() {
         fillProductDetailScreen()
     }
 
-    private fun fillProductDetailScreen(){
+    private fun fillProductDetailScreen() {
         lifecycleScope.launch {
-            withContext(Dispatchers.IO){
-                product = productDAO.getProductById(productID)
+
+            productDAO.getProductById(productID).collect {
+                product = it
+                it?.let {
+                    productDetailBinding.activityProductDetailImage.loadImage(it.imageURL)
+                    productDetailBinding.activityProductDetailName.text = it.name
+                    productDetailBinding.activityProductDetailDescription.text = it.description
+                    productDetailBinding.activityProductDetailValue.text =
+                        NumberFormat.getCurrencyInstance(Locale("pt", "br")).format(it.value)
+                } ?: finish()
             }
-            product?.let {
-                productDetailBinding.activityProductDetailImage.loadImage(it.imageURL)
-                productDetailBinding.activityProductDetailName.text = it.name
-                productDetailBinding.activityProductDetailDescription.text = it.description
-                productDetailBinding.activityProductDetailValue.text =
-                    NumberFormat.getCurrencyInstance(Locale("pt", "br")).format(it.value)
-            } ?: finish()
         }
     }
 
@@ -68,25 +66,31 @@ class ProductDetail : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.product_detail_menu_edit -> { goToFormActivity() }
-            R.id.product_detail_menu_delete -> { deleteProduct() }
+            R.id.product_detail_menu_edit -> {
+                goToFormActivity()
+            }
+
+            R.id.product_detail_menu_delete -> {
+                deleteProduct()
+            }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    private fun goToFormActivity(){
+    private fun goToFormActivity() {
         Intent(this, ProductFormActivity::class.java).apply {
             putExtra(KEY_PRODUCT_ID, product?.id)
             startActivity(this)
         }
     }
-    private fun deleteProduct(){
+
+    private fun deleteProduct() {
         lifecycleScope.launch {
-            withContext(Dispatchers.IO){
+
                 product?.let {
                     productDAO.removeProduct(it)
-                }
             }
+
             finish()
         }
     }

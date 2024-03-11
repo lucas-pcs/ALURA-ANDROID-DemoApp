@@ -9,10 +9,7 @@ import br.com.alura.orgs.ui.dialog.ProductFormImageDialog
 import br.com.alura.orgs.ui.extensions.loadImage
 import br.com.alura.orgs.ui.model.Product
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 
 class ProductFormActivity : AppCompatActivity() {
@@ -41,15 +38,15 @@ class ProductFormActivity : AppCompatActivity() {
         getProduct()
     }
 
-    private fun getProduct(){
+    private fun getProduct() {
         productID = intent.getLongExtra(KEY_PRODUCT_ID, 0L)
         val handlerGetProduct = CoroutineExceptionHandler { _, throwable ->
             throwable.printStackTrace()
             throw Exception("Fail to get product or update UI")
         }
         lifecycleScope.launch(handlerGetProduct) {
-            withContext(Dispatchers.IO){
-                product = productDAO.getProductById(productID)
+            productDAO.getProductById(productID).collect {
+                product = it
             }
             product?.let {
                 title = "Edit product"
@@ -60,7 +57,7 @@ class ProductFormActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadProductInfoOnScreen(product: Product){
+    private fun loadProductInfoOnScreen(product: Product) {
         productFormBinding.activityProductFormImage.loadImage(product.imageURL)
         productFormBinding.activityProductFormTextName.setText(product.name)
         productFormBinding.activityProductFormTextDescription.setText(product.description)
@@ -68,11 +65,11 @@ class ProductFormActivity : AppCompatActivity() {
         productFormBinding.activityProductFormSaveButton.text = "Update Product"
     }
 
-    private fun configureImageButton(){
+    private fun configureImageButton() {
         val imageButton = productFormBinding.activityProductFormImage
         imageButton.setOnClickListener {
-            ProductFormImageDialog(this).showImageDialog(url) {
-                    imageURL: String? ->  url = imageURL
+            ProductFormImageDialog(this).showImageDialog(url) { imageURL: String? ->
+                url = imageURL
                 productFormBinding.activityProductFormImage.loadImage(url)
             }
         }
@@ -87,9 +84,9 @@ class ProductFormActivity : AppCompatActivity() {
                 throw Exception("Fail to add product on DB")
             }
             lifecycleScope.launch(handlerAddProduct) {
-                withContext(Dispatchers.IO){
+
                     productDAO.addProduct(newProduct)
-                }
+
             }
             finish()
         }
